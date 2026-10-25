@@ -1,1 +1,1 @@
-# CSE122_BTQT_2551170976
+BTL-20 – OnboardAI – Hành trình hội nhập nhân sự mới
