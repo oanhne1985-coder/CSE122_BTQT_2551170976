@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OnboardAI – Hành trình hội nhập nhân sự mới</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap">
+<style>
+:root{color-scheme:light;--bg:#edf3f1;--sf:#fff;--ink:#14232b;--mut:#5b6b72;--pr:#0e7c66;--prx:#dff2ec;--ac:#f2a93b;--bd:#d3dfdb;--er:#c0392b;--ok:#1e8e4e;--wa:#a86a0c;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0e191d;--sf:#16252a;--ink:#e8f0ee;--mut:#93a6ac;--pr:#3fc4a4;--prx:#17332f;--bd:#27393f;--ac:#f2b34f;--er:#ff7b6b;--ok:#4cd08a;--wa:#f0b552;--on:#08201a}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0e191d;--sf:#16252a;--ink:#e8f0ee;--mut:#93a6ac;--pr:#3fc4a4;--prx:#17332f;--bd:#27393f;--ac:#f2b34f;--er:#ff7b6b;--ok:#4cd08a;--wa:#f0b552;--on:#08201a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1{font-size:1.6rem;margin:0 0 .2rem;line-height:1.2}h2{font-size:1.15rem;margin:0 0 .6rem}h3{font-size:1rem;margin:0 0 .4rem}p{margin:.2rem 0 .8rem}.sub{color:var(--mut);margin-bottom:1.2rem}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.btn{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:.45rem .85rem;cursor:pointer;min-height:38px}
+.btn:hover{border-color:var(--pr)}.btn.pr{background:var(--pr);color:var(--on);border-color:var(--pr);font-weight:500}.btn.dn{color:var(--er)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{min-height:30px;padding:.15rem .55rem;font-size:.85rem}
+input,select,textarea{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:.5rem .65rem;width:100%}
+label{display:block;margin-bottom:.8rem;font-weight:500}label input,label select,label textarea{margin-top:.25rem;font-weight:400}
+.err{color:var(--er);display:block;min-height:1em;font-weight:400}[aria-invalid=true]{border-color:var(--er)}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.1rem}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.lg{display:grid;grid-template-columns:1.1fr 1fr;gap:2rem;align-items:center;max-width:1000px;margin:0 auto;padding:2rem 1.2rem;min-height:100vh}.lg h1{font-size:2.3rem}.hero svg{width:100%;max-width:440px}
+@media(max-width:760px){.lg{grid-template-columns:1fr}.lg h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const $=(s,e=document)=>e.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const HERO='<svg viewBox="0 0 380 230" role="img" aria-label="Con đường hội nhập với các cột mốc từ ngày đầu đến tháng thứ ba"><path d="M30 190C100 190 90 125 160 125S240 175 280 115 340 55 346 40" fill="none" style="stroke:var(--pr)" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 13"/><circle cx="30" cy="190" r="11" style="fill:var(--pr)"/><circle cx="160" cy="125" r="11" style="fill:var(--ac)"/><circle cx="280" cy="115" r="11" style="fill:var(--ac)"/><path d="M346 44V6" style="stroke:var(--ink)" stroke-width="3"/><path d="M346 6l30 11-30 11z" style="fill:var(--ac)"/><g style="fill:var(--ink)" font-size="13" font-weight="500"><text x="8" y="218">Ngày 1</text><text x="136" y="157">Tuần 1</text><text x="252" y="147">Tháng 1</text><text x="296" y="60">Tháng 3</text></g><circle cx="30" cy="160" r="9" style="fill:var(--pr)"/><path d="M30 169v14" style="stroke:var(--pr)" stroke-width="6" stroke-linecap="round"/></svg>';
+const RL={newhire:'Nhân sự mới',mentor:'Mentor / Quản lý',hr:'HR',admin:'Quản trị viên'};
+const app=$('#app');
+const opts=(a,v)=>a.map(o=>{const[x,l]=Array.isArray(o)?o:[o,o];return`<option value="${esc(x)}"${x==v?' selected':''}>${esc(l)}</option>`}).join('');
+
+function login(){
+  app.innerHTML=`<div class="lg">
+    <section class="hero">${HERO}<h1>OnboardAI</h1><p>Hành trình hội nhập nhân sự mới: mỗi người đều biết việc tiếp theo và hỏi được mọi điều trong tuần đầu tiên.</p></section>
+    <section class="card">
+      <h2>Đăng nhập</h2>
+      <form id="lf" novalidate>
+        <label>Email<input id="em" type="email" autocomplete="email" placeholder="ten@onboardai.vn"><small class="err" id="ee"></small></label>
+        <label>Mật khẩu<input id="pw" type="password" autocomplete="current-password"><small class="err" id="pe"></small></label>
+        <label>Vai trò<select id="rl">${opts(Object.entries(RL))}</select></label>
+        <button class="btn pr" style="width:100%" id="sb">Đăng nhập</button>
+      </form>
+      <p style="margin-top:1rem"><b>Xem nhanh bản demo theo vai trò</b></p>
+      <div class="row">${Object.entries(RL).map(([k,v])=>`<button class="btn sm" data-r="${k}">${v}</button>`).join('')}</div>
+    </section>
+  </div>`;
+
+  $('#lf').onsubmit=async e=>{
+    e.preventDefault();
+    const em=$('#em'),pw=$('#pw');
+    const a=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value)?'':'Email chưa đúng định dạng.';
+    const b=pw.value.length>=6?'':'Mật khẩu cần ít nhất 6 ký tự.';
+    $('#ee').textContent=a;$('#pe').textContent=b;
+    em.setAttribute('aria-invalid',!!a);pw.setAttribute('aria-invalid',!!b);
+    if(a||b)return;
+    const s=$('#sb');s.disabled=true;s.textContent='Đang đăng nhập…';
+    await wait(600);
+    
+    // Lưu role vào localStorage và chuyển sang file trang tương ứng nếu muốn tách file
+    const selectedRole = $('#rl').value;
+    localStorage.setItem('onboardai-role', selectedRole);
+    
+    if(selectedRole === 'newhire') location.href = 'newhire.html'; 
+    else if(selectedRole === 'mentor') location.href = 'mentor.html';
+    else if(selectedRole === 'hr') location.href = 'hr.html';
+    else if(selectedRole === 'admin') location.href = 'admin.html';
+  };
+
+  app.querySelector('.lg').onclick=e=>{
+    const b=e.target.closest('[data-r]');
+    if(b) {
+      localStorage.setItem('onboardai-role', b.dataset.r);
+      if(b.dataset.r === 'newhire') location.href = 'newhire.html';
+      else if(b.dataset.r === 'mentor') location.href = 'mentor.html';
+      else if(b.dataset.r === 'hr') location.href = 'hr.html';
+      else if(b.dataset.r === 'admin') location.href = 'admin.html';
+    }
+  };
+}
+
+login();
+</script>
+</body>
+</html>
